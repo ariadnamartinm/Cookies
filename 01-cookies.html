@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      transition: background-color 0.5s ease;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <h2>Hola <span id="span-nombre"></span></h2>
+    <h2>Tu color favorito es el <span id="span-color"></span></h2>
+    <form id="datos" action="#">
+      <input type="text" id="nombre" placeholder="Escribe tu nombre">
+      <select id="color" name="select" placeholder="Selecciona tu color favorito">
+        <option value="red">Rojo</option>
+        <option value="yellow" selected>Amarillo</option>
+        <option value="cyan">Cian</option>
+      </select>
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", e => {
+      const form = document.getElementById("datos")
+      const selectColor = document.getElementById("color");
+      const inputNombre = document.getElementById("nombre");
+      const container = document.querySelector(".container");
+      const spanNombre = document.getElementById("span-nombre"); 
+      const spanColor = document.getElementById("span-color");
+
+      console.log(document.cookie);
+
+
+      //esta función sencilla crea una cookie de sesión
+      function guardarCookie(nombre, valor) {
+        document.cookie = nombre + "=" + valor;
+
+      }
+
+      function crearCookie(nombre, valorCookie, dias) {
+        let ruta = "/";
+        let nuevaCookie
+        if (dias) {
+          // el argumento dias es opcional
+          // si no especificamos la data cuando expira, se considera que la cookie dura solo una sesion y es destruido enseguida que la sesión acaba.
+          let data = new Date();
+          // establece la data cuando la cookie expira en milisegundos
+          data.setTime(data.getTime() + dias * 24 * 60 * 60 * 1000);
+          //El método toUTCString() convierte la data en una cadena de texto (string), utilizando la zona horaria UTC (Coordinated Universal Time).
+          let expira = data.toUTCString();
+          // "/" representa el directorio raíz. O sea: la cookie es accesible en todo el dominio web si var ruta = "/subdirectorio" la cookie será accesible solo en este subdirectorio. 
+          nuevaCookie = nombre + "=" + valorCookie + "; expires=" + expira + "; path=" + ruta;
+        } else {
+          nuevaCookie = nombre + "=" + valorCookie + "; path=" + ruta
+        }
+        document.cookie = nuevaCookie;
+      }
+  
+
+    function leerCookie(nombre) {
+      const lista = document.cookie.split(";");
+      for (i in lista) {
+        let busca = lista[i].search(nombre);
+        if (busca > -1) { micookie = lista[i] }
+      }
+      let igual = micookie.indexOf("=");
+      let valor = micookie.substring(igual + 1);
+      return valor;
+    }
+
+    function borrarCookie(nombre) {
+      crearCookie(nombre, "", -1);
+    }
+
+    //estas cookies son de sesion , tienes que cerrar el navegador para que se eliminen
+// no cambia de valor cada vez que escribes algo si no que lo añade a las cookies
+  //  document.cookie = "usuario=manolo";
+    //en este caso si que lo sobreescribe porque hemos puesto dos password 
+  // document.cookie = "password=manolo";
+   //document.cookie = "password=1234";
+
+    //crearCookie("c1", "valor1", 7);
+
+
+   // console.log(document.cookie)
+   //console.log (leerCookie("password"));
+   // borrarCookie("usuario")
+   // console.log(document.cookie)
+
+
+   form.addEventListener("submit", ev => {
+        ev.preventDefault();
+        const nombreValor = inputNombre.value;
+        const colorValor = selectColor.value;
+
+        // Llama a la función crearCookie con los valores del nombre y color
+        crearCookie("nombre", nombreValor, 7);
+        crearCookie("color", colorValor, 7);
+
+        // Actualiza los elementos del DOM con los valores introducidos
+        spanNombre.textContent = "Hola " + nombreValor;
+        spanColor.textContent = "Tu color favorito es el " + colorValor;
+      });
+
+      // Recupera los valores de las cookies al cargar la página
+      const nombreCookie = leerCookie("nombre");
+      const colorCookie = leerCookie("color");
+
+      // Actualiza los elementos del DOM con los valores almacenados en las cookies
+      if (nombreCookie) {
+        spanNombre.textContent = "Hola " + nombreCookie;
+      }
+
+      if (colorCookie) {
+        spanColor.textContent = "Tu color favorito es el " + colorCookie;
+        document.body.style.backgroundColor = colorCookie;
+      }
+    });
+   
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>

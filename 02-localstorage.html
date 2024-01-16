@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalStorage Example</title>
+  <style>
+    body {
+      transition: background-color 0.5s ease;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <h2>Hola <span id="span-nombre"></span></h2>
+    <h2>Tu color favorito es el <span id="span-color"></span></h2>
+    <form id="datos" action="#">
+      <input type="text" id="nombre" placeholder="Escribe tu nombre">
+      <select id="color" name="select" placeholder="Selecciona tu color favorito">
+        <option value="red">Rojo</option>
+        <option value="yellow" selected>Amarillo</option>
+        <option value="cyan">Cian</option>
+      </select>
+      <button type="submit">Enviar</button>
+      <button type="button" id="borrarDatos">Borrar Datos</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", e => {
+      const form = document.getElementById("datos");
+      const selectColor = document.getElementById("color");
+      const inputNombre = document.getElementById("nombre");
+      const container = document.querySelector(".container");
+      const spanNombre = document.getElementById("span-nombre");
+      const spanColor = document.getElementById("span-color");
+      const borrarDatosButton = document.getElementById("borrarDatos");
+
+      // Función para guardar en localStorage
+      function guardarLocalStorage(nombre, valor) {
+        localStorage.setItem(nombre, valor);
+      }
+
+      // Función para leer de localStorage
+      function leerLocalStorage(nombre) {
+        return localStorage.getItem(nombre);
+      }
+
+      // Función para borrar datos de localStorage
+      function borrarLocalStorage() {
+        localStorage.clear();
+        // Actualiza los elementos del DOM con valores vacíos
+        spanNombre.textContent = "";
+        spanColor.textContent = "";
+        document.body.style.backgroundColor = ""; // Elimina el color de fondo
+      }
+
+      form.addEventListener("submit", ev => {
+        ev.preventDefault();
+        const nombreValor = inputNombre.value;
+        const colorValor = selectColor.value;
+
+        // Llama a la función guardarLocalStorage con los valores del nombre y color
+        guardarLocalStorage("nombre", nombreValor);
+        guardarLocalStorage("color", colorValor);
+
+        // Actualiza los elementos del DOM con los valores introducidos
+        spanNombre.textContent = "Hola " + nombreValor;
+        spanColor.textContent = "Tu color favorito es el " + colorValor;
+        document.body.style.backgroundColor = colorValor; // Establece el color de fondo
+      });
+
+      borrarDatosButton.addEventListener("click", () => {
+        // Llama a la función para borrar datos de localStorage
+        borrarLocalStorage();
+      });
+
+      // Recupera los valores de localStorage al cargar la página
+      const nombreLocalStorage = leerLocalStorage("nombre");
+      const colorLocalStorage = leerLocalStorage("color");
+
+      // Actualiza los elementos del DOM con los valores almacenados en localStorage
+      if (nombreLocalStorage) {
+        spanNombre.textContent = "Hola " + nombreLocalStorage;
+      }
+
+      if (colorLocalStorage) {
+        spanColor.textContent = "Tu color favorito es el " + colorLocalStorage;
+        document.body.style.backgroundColor = colorLocalStorage; // Establece el color de fondo al cargar
+      }
+    });
+  </script>
+</body>
+
+</html>

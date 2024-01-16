@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ To do List </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .alert-success {
+            text-decoration: line-through;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center my-5"> To do list</h1>
+
+        <form id="formulario">
+            <input id="input" type="text" placeholder="Introduzca una tarea" class="form-control my-2" autofocus>
+            <button class="btn btn-primary btn-block w-100" type="submit">Agregar</button>
+
+        </form>
+
+        <div id="lista-tareas" class="mt-3">
+        </div>
+    </div>
+
+
+    <template class="tarea">
+        <div class="alert alert-warning d-flex justify-content-between align-items-center">
+            <p class="m-0">
+                Tarea 1
+            </p>
+            <h3 class="m-0">
+                <i class="fa-regular fa-square-check text-success" role="button"></i>
+                <i class="fas fa-trash-alt " role="button"></i>
+            </h3>
+        </div>
+    </template>
+
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", e => {
+            const formulario = document.getElementById("formulario");
+            const divTareas = document.getElementById("lista-tareas");
+            const plantillaTarea = document.querySelector("template.tarea").content;
+            const inputTarea = document.querySelector("#input");
+
+            // Intenta obtener la lista de tareas del localStorage o establece una lista vacía si no existe
+            let listaTareas = obtenerListaTareas() || [];
+
+            console.log(listaTareas);
+            pintaTareas(listaTareas);
+
+            function pintaTareas(tareas) {
+                divTareas.innerHTML = "";
+                const fragment = new DocumentFragment();
+
+                tareas.forEach(tarea => {
+                    plantillaTarea.querySelector("p").textContent = tarea.descripcion;
+                    const clone = plantillaTarea.cloneNode(true);
+                    const divAlerta = clone.querySelector(".alert-warning");
+
+                    divAlerta.dataset.id = tarea.id;
+
+                    if (tarea.completada) {
+                        divAlerta.classList.remove("alert-warning");
+                        divAlerta.classList.add("alert-success");
+
+                        const botonSquareCheck = clone.querySelector(".fa-square-check");
+                        botonSquareCheck.classList.remove("fa-square-check");
+                        botonSquareCheck.classList.add("fa-remove");
+                        botonSquareCheck.classList.replace("fa-regular", "fa-solid");
+                    }
+
+                    fragment.appendChild(clone);
+                });
+
+                divTareas.appendChild(fragment);
+
+                formulario.addEventListener("submit", e => {
+                    e.preventDefault();
+                    if (inputTarea.value) {
+                        const nuevaTarea = {
+                            id: Date.now(),
+                            descripcion: inputTarea.value,
+                            completada: false,
+                        };
+
+                        listaTareas.push(nuevaTarea);
+                        // Guarda la lista actualizada en el localStorage
+                        guardarListaTareas(listaTareas);
+
+                        pintaTareas(listaTareas);
+                        inputTarea.value = "";
+                    } else {
+                        console.log("No ha introducido tarea");
+                    }
+                });
+            }
+
+            divTareas.addEventListener("click", e => {
+                e.stopPropagation();
+
+                if (e.target.classList.contains("fa-trash-alt")) {
+                    const idTarea = e.target.parentNode.parentNode.dataset.id;
+                    listaTareas = listaTareas.filter(tarea => tarea.id != idTarea);
+                    // Guarda la lista actualizada en el localStorage
+                    guardarListaTareas(listaTareas);
+                    pintaTareas(listaTareas);
+                } else if (e.target.classList.contains("fa-square-check")) {
+                    const idTarea = e.target.parentNode.parentNode.dataset.id;
+                    const tareaCompletada = listaTareas.find(tarea => tarea.id == idTarea);
+                    tareaCompletada.completada = true;
+                    // Guarda la lista actualizada en el localStorage
+                    guardarListaTareas(listaTareas);
+                    pintaTareas(listaTareas);
+                } else if (e.target.classList.contains("fa-remove")) {
+                    const idTarea = e.target.parentNode.parentNode.dataset.id;
+                    const tareaCompletada = listaTareas.find(tarea => tarea.id == idTarea);
+                    tareaCompletada.completada = false;
+                    // Guarda la lista actualizada en el localStorage
+                    guardarListaTareas(listaTareas);
+                    pintaTareas(listaTareas);
+                }
+            });
+
+            // Función para guardar la lista de tareas en el localStorage
+            function guardarListaTareas(tareas) {
+                localStorage.setItem("listaTareas", JSON.stringify(tareas));
+            }
+
+            // Función para obtener la lista de tareas almacenada en el localStorage
+            function obtenerListaTareas() {
+                const storedData = localStorage.getItem("listaTareas");
+                return storedData ? JSON.parse(storedData) : null;
+            }
+        });
+    </script>
+</body>
+
+</html>
